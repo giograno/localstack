@@ -51,6 +51,7 @@ jobs:
         cd /home/runner/work;
         pip install deepdiff
     - uses: jannekem/run-python-script-action@v1
+      id: script
       with:
           script: |
             import os
@@ -73,7 +74,6 @@ jobs:
     - name: Print output
       if: ${{ steps.script.outputs.stdout != '{}' }}
       run: |
-        echo "hello"
         printenv "SCRIPT_STDOUT"
       env: 
         SCRIPT_STDOUT: ${{ steps.script.outputs.stdout }}
