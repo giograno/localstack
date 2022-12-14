@@ -70,7 +70,6 @@ jobs:
 
             ddiff = DeepDiff(master, branch, ignore_order=True)
             print(ddiff)
-            print('hoi')
     - name: Print output
       if: ${{ steps.script.outputs.stdout != '{}' }}
       run: |
