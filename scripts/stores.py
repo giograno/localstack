@@ -8,10 +8,11 @@ import sys
 def create_json(branch: str):
     from localstack.services.stores import BaseStore
 
-    path = "localstack"
+    # path = "/localstack"
+    path = "*/"
 
     model_files = glob.glob(path + '**/models.py', recursive=True)
-
+    print(model_files)
     # store_name, dict
     hash_map: dict[str, dict[str, str]] = dict()
 
@@ -29,8 +30,8 @@ def create_json(branch: str):
             good_attrs = [a for a in attributes if not (a[0].startswith('__') and a[0].endswith('__'))]
             hash_map[store_name] = {a: b.__class__.__name__ for a, b in good_attrs}
 
-    with open(f'scripts/{branch}.json', 'w') as out_file:
-        dump = json.dumps(hash_map, sort_keys=True)
+    with open(f'/home/runner/work/store-diff/{branch}.json', 'w') as out_file:
+        json.dump(hash_map, out_file, sort_keys=True)
 
 
 if __name__ == '__main__':
