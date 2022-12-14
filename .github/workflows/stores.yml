@@ -70,7 +70,7 @@ jobs:
 
             ddiff = DeepDiff(master, branch, ignore_order=True)
             print(ddiff)
-            assert diff
+            assert ddiff
     - name: Print output
       if: ${{ steps.script.outputs.error == 'false' }}
       run: |
