@@ -70,8 +70,9 @@ jobs:
 
             ddiff = DeepDiff(master, branch, ignore_order=True)
             print(ddiff)
+            assert diff
     - name: Print output
-      if: ${{ steps.script.outputs.stdout != '{}' }}
+      if: ${{ steps.script.outputs.error == 'false' }}
       run: |
         printenv "SCRIPT_STDOUT"
       env: 
