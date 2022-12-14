@@ -69,10 +69,10 @@ jobs:
 
             ddiff = DeepDiff(master, branch, ignore_order=True)
             print(ddiff)
-      - name: Print output
-        if: ${{ steps.script.outputs.stdout != '{}' }}
-        run: |
-          echo "hello"
-          printenv "SCRIPT_STDOUT"
-        env: 
-          SCRIPT_STDOUT: ${{ steps.script.outputs.stdout }}
+    - name: Print output
+      if: ${{ steps.script.outputs.stdout != '{}' }}
+      run: |
+        echo "hello"
+        printenv "SCRIPT_STDOUT"
+      env: 
+        SCRIPT_STDOUT: ${{ steps.script.outputs.stdout }}
