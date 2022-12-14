@@ -1,0 +1,82 @@
+name: Check Stores
+
+on: [pull_request]
+
+jobs:
+  paths-filter:
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.filter.outputs.workflows }}
+    steps:
+    # create temporary directory
+    - name: Create temporary directory
+      run: |
+        cd /home/runner/work; mkdir store-diff
+    # extract set from master
+    - name: Checkout Master
+      uses: actions/checkout@v3
+      with:
+        ref: master
+    - name: Install build dependencies
+      run: |
+        sudo apt-get install libsasl2-dev jq
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+    - name: Install CLI test dependencies
+      run: |
+        make install-dev
+    - name: Run the script for master
+      run: |
+        source .venv/bin/activate
+        python scripts/stores.py master
+
+    # extract set from branch
+    - name: Checkout Branch
+      uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+    - name: Install CLI test dependencies
+      run: |
+        make install-dev
+    - name: Run the script for branch
+      run: |
+        source .venv/bin/activate
+        python scripts/stores.py branch
+    - name: Install diff stuff
+      run: |
+        cd /home/runner/work;
+        pip install deepdiff
+    - uses: jannekem/run-python-script-action@v1
+      id: script
+      with:
+          fail-on-error: false
+          script: |
+            import os
+            import json
+            from deepdiff import DeepDiff
+
+            master_path = "/home/runner/work/store-diff/master.json"
+            branch_path = "/home/runner/work/store-diff/branch.json"
+            if not os.path.exists(master_path) or not os.path.exists(branch_path):
+                exit(0)
+
+            with open(master_path, 'r') as f:
+                master = json.load(f)
+            with open(branch_path, 'r') as f:
+                branch = json.load(f)
+
+            ddiff = DeepDiff(master, branch, ignore_order=True)
+            print(ddiff)
+            assert ddiff
+    - name: Create comment in PR
+      if: ${{ steps.script.outputs.error == 'false' }}
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          Alert: a store has been changed! Look at this diff `${{ steps.script.outputs.stdout }}`.
+        reactions: eyes
