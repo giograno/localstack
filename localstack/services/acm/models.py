@@ -10,7 +10,7 @@ from localstack.services.stores import (
 class AcmDummyStore(BaseStore):
 
     attribute_one: Dict[str, List[Dict]] = LocalAttribute(default=dict)
-    attribute_two: Dict[str, List[Dict]] = LocalAttribute(default=dict)
+    # attribute_two: Dict[str, List[Dict]] = LocalAttribute(default=dict)
 
 
 acm_stores = AccountRegionBundle("acm", AcmDummyStore)
